@@ -44,5 +44,5 @@ If some node files, master will check if some files have less than 4 replices, i
 If the master dies, no new files can be stored in this system, and a new election will be raised. After the election complete, the new master will use "Askfile" to ask each node what it stored in its file system. And using this info to reconstruct a file meta info database.
 
 
-##Test
+## Test
 I have tested this program in my own computer, the files are stored in "tmp/sdfs/" directory, and also test on 10 machines in a VM. 
