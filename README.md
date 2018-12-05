@@ -1,29 +1,36 @@
 # sdfs: Simple Distributed File System
 ## Usage
 Use `go build` to compile the code 
-The binary will be generated as "sdfs"(Macos) or "sdfs.exe"
+The binary will be generated as "sdfs"(Mac OS) or "sdfs.exe". But this program now only support OS X and Linux right now for the file storage functionality.
+
+If running in a single machine:
 Firstly need to start the introducer, use `./sdfs -isIntro` to start the introducer, introducer will use port 9123 
-Then use `.sdfs -port portNumber` to start a host.
+Then use `.sdfs -port portNumber` to start a host. 
+
+If running in different machines:
+Still start the introducer first, but with command `./sdfs -isIntro -prod` and start all differnt host with `./sdfs -prod`, but every nodes need to know the IP and port number of the introducer, this part needs to be hard coded first.
 
 ## Commands:
-
-1. `id` to show its id(contains node IP address, port number and a timestampe when it started)
-2. `membership` to show all the nodes in the system
-3. `ping` to show all nodes it will ping 
+When the program is running, user can type in different commands to check its status.
+1. `id` to show its id(each node have a unique id, it contains its IP address, port number and a timestampe after it started)
+2. `membership` to show all the nodes in the system(each node knows this info)
+3. `ping` to show the pinglist of a node(pinglist means which node it can ping ) 
 4. `intro` to show who is now ther introducer
 5. `master` to show the master for the file system
 6. `put localname sdfaname` to put a file into SDFS file system
 7. `get sdfsname localname` and `get-versions n sdfsname localname` to fetch a file from sdfs system
-8. `store` to show which file is now stored in current host
+8. `store` to show which file is now stored in current host(each always file have 4 replicas)
 9. `ls sdfsname` to show where a specific file is now being stored
 10. `delete sdfsname` to delete a sdfsfile in SDFS file system
-11. `showdb` in the master to show all the files stored in current database
+11. `showdb` only valid in the file system master, used to show all the files stored in current database and where a specific file is stored
 
 ## Implementation details
 #### distribued membership protol
-To implementing a distribued file system, we fistly need a distribute group protocol thus we will be able to know which node is currently in this group, and when there is a failure how can we manage the file storage.
+To implementing a distribued file system, we fistly need a distribute group protocol thus we will be able to know which node is currently in this group, thus we can store file replices in this node. It also make sure that when a failure occurs(simply means a node crashed), nodes in the group can detect this.
 
-I have designed a distributed membership protocol. In this protocol, there are many kinds of message used to maintain the functionality of this group. Like "JOIN" message and "JOINACK" message used for joining this group. Like "DELETE" or "UPDATA" used to update the membership, like "Ping" and "ACK" used to check if a node is still alive. They are all defined in package com, in "com.go" file.
+I have designed a distributed membership protocol. In this protocol, there are many kinds of message used to maintain the functionality of this group. Like "JOIN" message used for a node to join the group, and "JOINACK" message used for introducer to respond to join request . Like "DELETE" or "UPDATA" used to update the membership, like "Ping" and "ACK" used to check if a node is still alive. They are all defined in package com, in "com.go" file. Below is a simple table used to describe what kind of messages are defined and their usage
+![Table](relative/images/tables.png)
+
 
 For my system, there is a introducer, and other nodes are just hosts who can join the group. Each host is uniquely identified by its port number, IP address and a timestamp. I denoted it as NodeID. And when a node wants to join the group, It will send "Join" message to the introducer, and the introducer will reply with a "JoinACK" message and the pinglist for this node. 
 
@@ -45,4 +52,4 @@ If the master dies, no new files can be stored in this system, and a new electio
 
 
 ## Test
-I have tested this program in my own computer, the files are stored in "tmp/sdfs/" directory, and also test on 10 machines in a VM. 
+I have tested this program in my own computer, the files are stored in "tmp/sdfs/" directory, and also test this program running in 10 different machines. 
