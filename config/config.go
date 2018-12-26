@@ -30,7 +30,9 @@ func SetupFlags() Config {
 	flag.Parse()
 
 	if config.Prod {
-		config.Introducer = "fa18-cs425-g14-01.cs.illinois.edu:9123"
+		// set Introducer's IP here
+		fmt.Println("you must set up introducer's IP first to use prod Mode")
+		config.Introducer = "IP:9123"
 	}
 
 	return *config
